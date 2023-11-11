@@ -58,7 +58,7 @@ function GetPosition(input: InputObject): Vector3
         local Position = input.Position
         local X = getMinMax(Position.X, -1, 1)
         local Y = getMinMax(Position.Y, -1, 1)
-        local Z = getMinMax(Position.Z, -1, 1)
+        local Z = 1 --// Defaults to 0 in position so set to 1
         return Vector3.new(X,Y,Z)
     end
     return Vector3.new(1,1,1) --// If no position then return vector of 1
@@ -103,9 +103,10 @@ function Functions:BuildVector3(input: InputObject): Vector3
         else
             Z = 0
         end
+
         if InputData.Inverted then Z = invertValue(Z) end --// If Input Invert then Invert Number
     end
-    
+
     return Vector3.new(X,Y,Z)
 end
 
@@ -203,6 +204,7 @@ function Functions:InputChanged(input: InputObject, inputState: Enum.UserInputSt
     local Value = self:GetValue(input, inputState)
     if Value == nil then print ("Could not get value") return end
     self.value = Value
+    if Value == Vector3.new(0,0,0) then InputData.InUse = false end
 
     --// Send Signal
     if inputState == Enum.UserInputState.Begin then
