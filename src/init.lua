@@ -59,7 +59,6 @@ function GetPosition(input: InputObject): Vector3
         local X = getMinMax(Position.X, -1, 1)
         local Y = getMinMax(Position.Y, -1, 1)
         local Z = getMinMax(Position.Z, -1, 1)
-        print(Position)
         return Vector3.new(X,Y,Z)
     end
     return Vector3.new(1,1,1) --// If no position then return vector of 1
@@ -146,6 +145,16 @@ function invertValue(value: Vector3 | number | boolean)
     end
 end
 
+function addDeadzone(number: number, deadzone: number)
+    if number > 0 and number < deadzone then return 0 --// Positive
+    elseif number < 0 and number > -deadzone then return 0 --// Negative
+    else return number end
+end
+
+function addDeadzoneToVector(vector: Vector3, deadzone: number): Vector3
+    return Vector3.new(addDeadzone(vector.X, deadzone),addDeadzone(vector.Y, deadzone),addDeadzone(vector.Z, deadzone))
+end
+
 function Functions:GetValue(input: InputObject, inputState: Enum.UserInputState): Vector3 | number | boolean
     local InputData = self:GetInputData(input)
     if not InputData then return end --// Input not found
@@ -153,6 +162,7 @@ function Functions:GetValue(input: InputObject, inputState: Enum.UserInputState)
     
     if self.type == "Vector3" then
         Value = GetValueFixed(self:BuildVector3(input),self:BuildVector3End(), inputState)
+        Value = addDeadzoneToVector(Value, self.deadzone)
     elseif self.type == "Number" then
         local v = 1
         if input.Position ~= nil then
